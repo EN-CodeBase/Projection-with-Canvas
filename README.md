@@ -6,8 +6,12 @@ This is code from a beautiful tutorial by Tsoding on YT. i learned a thingy here
 
 Use th formulas:
 
-  x' = x/z
-  y' = y/z
+$$
+\begin{aligned}
+x' &= \frac{x}{z} \\
+y' &= \frac{y}{z}
+\end{aligned}
+$$
 
 This is how you make a 3d point be projected on a 2d screen
 
