@@ -1,0 +1,197 @@
+
+<canvas id="canvas"></canvas>
+
+<!-- 
+
+    WANA PROJECT KIDS
+
+    Aj AJ KAPITEN
+
+    THAN USE :
+
+        x' = x/z
+        y' = y/z
+
+        to project a 3d point to a 2d screen
+        use the functions below whenever needed
+
+
+    UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU!!!!!!!!!!!!!!!!!!
+
++----------------------------------
+|       THE CODE EXPLAINED        |
++----------------------------------
+
+-- plot the thing in the canvas or array printer --
+plot(
+    -- convert the Coord sys used from [-1; 1] to [0; Width/Height] 
+        which is used by canvas or array printing --
+    screen(
+        -- project the point to a screen --
+        project(
+            
+            {x, y, z}
+)));
+
+-->
+
+
+
+<script>
+
+    console.log(canvas);
+
+    const Width  = 800
+    const Height = 800
+
+    canvas.width  = Width
+    canvas.height = Height
+
+// ------------------ 
+    const ctx = canvas.getContext("2d")
+    console.log(ctx);
+    const BACKGROUND = '#505050'
+    const FOREGROUND = '#50FF50'
+
+
+    function clear(){
+        ctx.fillStyle = BACKGROUND
+        ctx.fillRect(0, 0, Width, Height)
+    }
+
+    // plot the point on canvas
+    function plot({x, y}){
+
+        const s = 20 // pixel size
+
+        ctx.fillStyle = FOREGROUND
+        ctx.fillRect(x, y, s, s)
+    }
+
+    // draw a line between two points
+    function line(p1, p2){
+
+        ctx.strokeStyle = FOREGROUND
+        ctx.beginPath()
+        ctx.moveTo(p1.x, p1.y)
+        ctx.lineTo(p2.x, p2.y)
+        ctx.stroke()
+    }
+
+    // convert coord sys from -1 .. 1 to 0 .. width/height
+    function screen({x, y}){
+
+        const pxHalf = 10
+
+        return {
+            x: (x+1)/2 * Width        - pxHalf,
+            y: (1 - (y+1)/2) * Height - pxHalf
+        }
+    }
+
+    // uses the projection formula of
+    //  x' = x/z
+    //  y' = y/z
+    // to project a 3d point to a 2d screen
+    function project({x, y, z}){
+        return {
+            x: x/z,
+            y: y/z
+        }
+    }
+
+    const FPS = 60;
+    dz = 1;
+    angle = 0;
+
+    
+    // moves in z
+    function translate_z({x, y, z}, dz){
+
+        return {
+            x,
+            y,
+            z: z+dz
+        }
+    }
+
+    // rretullon rreth boshtit Y, aka ne xz
+    function rotate_xz({x, y, z}, angle){
+
+        sin =  Math.sin(angle)
+        cos =  Math.cos(angle)
+
+        return{
+            x: x* cos - z* sin,
+            y,
+            z: x* sin + z* cos
+        } 
+    }
+
+    // verticies list
+    const vs = [
+
+        {x: 0.25,  y:  0.25, z: 0.25},
+        {x: 0.25,  y: -0.25, z: 0.25},
+        {x: -0.25, y:  0.25, z: 0.25},
+        {x: -0.25, y: -0.25, z: 0.25},
+
+        {x: 0.25,  y:  0.25, z: -0.25},
+        {x: 0.25,  y: -0.25, z: -0.25},
+        {x: -0.25, y:  0.25, z: -0.25},
+        {x: -0.25, y: -0.25, z: -0.25}
+    ]
+
+    // faces list, the faces of an obj
+    const fs = [
+
+        [0, 1, 3, 2],
+        [4, 5, 7, 6],
+        [0, 4],
+        [1, 5],
+        [3, 7],
+        [2, 6]
+
+    ]
+
+    function frame(){
+        
+        clear()
+    
+        dt = 1/FPS
+        // dz += 1*dt;
+
+
+        angle += 2*Math.PI * dt / 10
+
+        // for(const v of vs){
+
+        //     plot(screen(project(translate_z(rotate_xz( v, angle ), dz ))));
+
+        // }
+
+        // this for loop settup is used to get the verticies of a line
+        for(const f of fs){
+            for(i = 0; i < f.length; i++){
+
+                // get vertex 1 & vertex 2 to plot a line connecting them 
+                const v1 = vs[f[i]]
+                const v2 = vs[f[(i+1)%f.length]]
+                // its important to use mod like above 
+                // as you to make a square, the last and first verticies need to connect
+
+                // --------------------------------------
+                line(
+                    screen(project(translate_z(rotate_xz( v1, angle ), dz ))),
+                    screen(project(translate_z(rotate_xz( v2, angle ), dz )))
+                )
+            }
+        }
+        
+
+        setTimeout(frame , 1000/FPS);
+    }
+
+    setTimeout(frame , 1000/FPS);
+
+</script>
